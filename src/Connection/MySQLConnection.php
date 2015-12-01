@@ -6,9 +6,10 @@ use AsyncPHP\Icicle\Database\Connection;
 use Icicle\Loop;
 use Icicle\Promise\Deferred;
 use Icicle\Promise\PromiseInterface;
+use InvalidArgumentException;
 use MySQLi;
 
-class MySQLConnection implements Connection
+final class MySQLConnection implements Connection
 {
     /**
      * @var null|MySQLi
@@ -31,14 +32,34 @@ class MySQLConnection implements Connection
      * @param array $config
      *
      * @return bool
+     *
+     * @throws InvalidArgumentException
      */
     public function connect(array $config)
     {
-        $config = array_merge([
-            "host" => "127.0.0.1",
-            "port" => 3306,
-            "socket" => null,
-        ], $config);
+        if (!isset($config["host"])) {
+            $config["host"] = "127.0.0.1";
+        }
+
+        if (!isset($config["username"])) {
+            throw new InvalidArgumentException("Undefined connection username");
+        }
+
+        if (!isset($config["password"])) {
+            throw new InvalidArgumentException("Undefined connection password");
+        }
+
+        if (!isset($config["database"])) {
+            throw new InvalidArgumentException("Undefined connection database");
+        }
+
+        if (!isset($config["port"])) {
+            $config["port"] = 3306;
+        }
+
+        if (!isset($config["socket"])) {
+            $config["socket"] = null;
+        }
 
         $this->connection = mysqli_connect(
             $config["host"],
@@ -65,7 +86,7 @@ class MySQLConnection implements Connection
             $this->connection,
         ];
 
-        $outer = Loop\periodic($this->poll, function() use (&$outer, $links, $errors, $rejects, $query, $deferred) {
+        $outer = Loop\periodic($this->poll, function () use (&$outer, $links, $errors, $rejects, $query, $deferred) {
             if ($this->ready) {
                 $this->ready = false;
                 $outer->stop();

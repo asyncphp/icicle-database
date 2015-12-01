@@ -2,7 +2,7 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
-use AsyncPHP\Icicle\Database\Connection\MySQLConnection;
+use AsyncPHP\Icicle\Database\ConnectionFactory;
 use Icicle\Http\Message\RequestInterface;
 use Icicle\Http\Message\Response;
 use Icicle\Http\Server\Server;
@@ -10,12 +10,13 @@ use Icicle\Loop;
 use Icicle\Socket\SocketInterface;
 use Icicle\Stream\MemorySink;
 
-$connection = new MySQLConnection();
+$factory = new ConnectionFactory();
 
-$connection->connect([
-    "database" => "icicle",
-    "username" => "",
-    "password" => "",
+$connection = $factory->create([
+    "driver" => getenv("ICICLE_DRIVER"),
+    "database" => getenv("ICICLE_DATABASE"),
+    "username" => getenv("ICICLE_USERNAME"),
+    "password" => getenv("ICICLE_PASSWORD"),
 ]);
 
 $server = new Server(function (RequestInterface $request, SocketInterface $socket) use ($connection) {

@@ -10,12 +10,14 @@ interface Connection
      * @param array $config
      *
      * @return bool
+     *
+     * @throws InvalidArgumentException
      */
     public function connect(array $config);
 
     /**
-     * Runs a query and resolves to an array of results for query statements. Manipulation statements
-     * resolve without an value.
+     * Runs a query and resolves to an array of results for query statements. Manipulation
+     * statements resolve without an value.
      *
      * @param string $query
      *
