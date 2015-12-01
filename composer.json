@@ -2,7 +2,8 @@
     "name": "asyncphp/icicle-database",
     "license": "MIT",
     "require": {
-        "icicleio/icicle": "^0.8"
+        "icicleio/icicle": "^0.8",
+        "aura/sqlquery": "^2.6"
     },
     "require-dev": {
         "icicleio/http": "^0.2",

@@ -1,15 +1,15 @@
 <?php
 
-namespace AsyncPHP\Icicle\Database\Connection;
+namespace AsyncPHP\Icicle\Database\Connector;
 
-use AsyncPHP\Icicle\Database\Connection;
+use AsyncPHP\Icicle\Database\Connector;
 use Icicle\Loop;
 use Icicle\Promise\Deferred;
 use Icicle\Promise\PromiseInterface;
 use InvalidArgumentException;
 use MySQLi;
 
-final class MySQLConnection implements Connection
+final class MySQLConnector implements Connector
 {
     /**
      * @var null|MySQLi
@@ -42,15 +42,15 @@ final class MySQLConnection implements Connection
         }
 
         if (!isset($config["username"])) {
-            throw new InvalidArgumentException("Undefined connection username");
+            throw new InvalidArgumentException("Undefined username");
         }
 
         if (!isset($config["password"])) {
-            throw new InvalidArgumentException("Undefined connection password");
+            throw new InvalidArgumentException("Undefined password");
         }
 
         if (!isset($config["database"])) {
-            throw new InvalidArgumentException("Undefined connection database");
+            throw new InvalidArgumentException("Undefined database");
         }
 
         if (!isset($config["port"])) {

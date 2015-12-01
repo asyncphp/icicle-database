@@ -4,7 +4,7 @@ namespace AsyncPHP\Icicle\Database;
 
 use Icicle\Promise\PromiseInterface;
 
-interface Connection
+interface Connector
 {
     /**
      * @param array $config
