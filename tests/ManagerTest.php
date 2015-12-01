@@ -8,7 +8,7 @@ use Icicle\Loop;
 use Icicle\Coroutine;
 
 /**
- * @covers ManagerFactory
+ * @covers AsyncPHP\Icicle\Database\ManagerFactory
  */
 class MemoryDriverTest extends PHPUnit_Framework_TestCase
 {
@@ -26,13 +26,17 @@ class MemoryDriverTest extends PHPUnit_Framework_TestCase
 
             $time = time();
 
-            yield $manager->table("test1")->insert(["text" => $time]);
+            yield
+                $manager
+                    ->table("test")
+                    ->insert(["text" => $time]);
 
-            $row = (yield $manager
-                ->table("test1")
-                ->select()
-                ->where("text = ?", $time)
-                ->first()
+            $row = (yield
+                $manager
+                    ->table("test")
+                    ->select()
+                    ->where("text = ?", $time)
+                    ->first()
             );
 
             $this->assertEqualsAfterDelay(0.5, $row["text"], $time);
