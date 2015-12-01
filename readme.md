@@ -18,6 +18,15 @@ $connector = $factory->create([
     "database" => getenv("ICICLE_DATABASE"),
     "username" => getenv("ICICLE_USERNAME"),
     "password" => getenv("ICICLE_PASSWORD"),
+    "remit" => [
+        "driver" => "zeromq",
+        "server" => [
+            "port" => getenv("ICICLE_REMIT_SERVER_PORT"),
+        ],
+        "client" => [
+            "port" => getenv("ICICLE_REMIT_CLIENT_PORT"),
+        ],
+    ],
 ]);
 
 yield $connector->query(
@@ -47,6 +56,15 @@ $manager = $factory->create([
     "database" => getenv("ICICLE_DATABASE"),
     "username" => getenv("ICICLE_USERNAME"),
     "password" => getenv("ICICLE_PASSWORD"),
+    "remit" => [
+        "driver" => "zeromq",
+        "server" => [
+            "port" => getenv("ICICLE_REMIT_SERVER_PORT"),
+        ],
+        "client" => [
+            "port" => getenv("ICICLE_REMIT_CLIENT_PORT"),
+        ],
+    ],
 ]);
 
 yield $manager->table("pages")->select("*")->first();
@@ -54,9 +72,9 @@ yield $manager->table("pages")->select("*")->first();
 
 ## Caveats
 
-- `mysql` is the only supported driver
-- `mysql` driver does not support prepared statements
-- `join`, `groupBy`, `having`, `orHaving`, `distinct` methods are missing
+- `mysql`, `pgsql`, `sqlite`, and `sqlsrv` are the only supported drivers.
+- `join`, `groupBy`, `having`, `orHaving`, `distinct` methods are missing.
+- PDO is blocking, so statements are executed in a different process. Remit is used for inter-process communication, and there is a bit of overhead.
 
 ## Versioning
 

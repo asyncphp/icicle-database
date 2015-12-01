@@ -2,7 +2,8 @@
 
 namespace AsyncPHP\Icicle\Database;
 
-use AsyncPHP\Icicle\Database\Builder\MySQLBuilder;
+use AsyncPHP\Icicle\Database\Builder\AuraBuilder;
+use Aura\SqlQuery\QueryFactory;
 use InvalidArgumentException;
 
 final class BuilderFactory
@@ -12,7 +13,7 @@ final class BuilderFactory
      *
      * @return Builder
      *
-     * @throw InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function create(array $config)
     {
@@ -20,10 +21,12 @@ final class BuilderFactory
             throw new InvalidArgumentException("Undefined driver");
         }
 
-        if ($config["driver"] === "mysql") {
-            return new MySQLBuilder();
+        if (!in_array($config["driver"], ["sqlsrv", "mysql", "pgsql", "sqlite"])) {
+            throw new InvalidArgumentException("Unrecognised driver");
         }
 
-        throw new InvalidArgumentException("Unrecognised driver");
+        return new AuraBuilder(
+            new QueryFactory($config["driver"])
+        );
     }
 }

@@ -3,7 +3,10 @@
     "license": "MIT",
     "require": {
         "icicleio/icicle": "^0.8",
-        "aura/sqlquery": "^2.6"
+        "aura/sql": "^2.4",
+        "aura/sqlquery": "^2.6",
+        "asyncphp/doorman": "^2.0",
+        "asyncphp/remit": "^2.0"
     },
     "require-dev": {
         "icicleio/http": "^0.2",

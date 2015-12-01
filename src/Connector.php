@@ -3,34 +3,31 @@
 namespace AsyncPHP\Icicle\Database;
 
 use Icicle\Promise\PromiseInterface;
+use InvalidArgumentException;
 
 interface Connector
 {
     /**
+     * Connects to a database.
+     *
      * @param array $config
      *
-     * @return bool
+     * @return PromiseInterface
      *
      * @throws InvalidArgumentException
      */
     public function connect(array $config);
 
     /**
-     * Runs a query and resolves to an array of results for query statements. Manipulation
-     * statements resolve without an value.
+     * Prepares and executes a statement from a query, and resolves to an array of results.
+     * Manipulation queries resolve without an value.
      *
      * @param string $query
+     * @param array $values
      *
      * @return PromiseInterface
-     */
-    public function query($query);
-
-    /**
-     * Escapes a value for interpolation.
      *
-     * @param mixed $value
-     *
-     * @return mixed
+     * @throws InvalidArgumentException
      */
-    public function escape($value);
+    public function query($query, $values);
 }

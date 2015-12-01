@@ -18,6 +18,11 @@ final class Manager
     private $builder;
 
     /**
+     * @var array
+     */
+    private $operations = [];
+
+    /**
      * @param Connector $connector
      * @param Builder $builder
      */
@@ -35,12 +40,44 @@ final class Manager
      */
     public function __call($method, array $parameters = [])
     {
-        $builder = call_user_func_array([$this->builder, $method], $parameters);
+        $operations = $this->operations;
+        $operations[] = [$method, $parameters];
 
+        return $this->cloneWith("operations", $operations);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return static
+     */
+    public function cloneWith($key, $value)
+    {
         $clone = clone $this;
-        $clone->builder = $builder;
+        $clone->$key = $value;
 
         return $clone;
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return static
+     */
+    public function table($table)
+    {
+        return $this->cloneWith("builder", $this->builder->table($table));
+    }
+
+    /**
+     * @param string $columns
+     *
+     * @return static
+     */
+    public function select($columns = "*")
+    {
+        return $this->cloneWith("builder", $this->builder->select($columns));
     }
 
     /**
@@ -60,24 +97,26 @@ final class Manager
     public function get()
     {
         return Coroutine\create(function () {
-            yield $this->connector->query(
-                $this->interpolate($this->builder->build())
-            );
+            $builder = $this->applyOperationsTo($this->builder);
+
+            list($statement, $values) = $builder->build();
+            yield $this->connector->query($statement, $values);
         });
     }
 
     /**
-     * @param array $build
+     * @param Builder $builder
      *
-     * @return string
+     * @return Builder
      */
-    private function interpolate(array $build)
+    private function applyOperationsTo($builder)
     {
-        list($statement, $values) = $build;
+        foreach ($this->operations as $operation) {
+            list($method, $parameters) = $operation;
+            $builder = call_user_func_array([$builder, $method], $parameters);
+        }
 
-        return preg_replace_callback("/\\:([_0-9a-zA-Z]+)/", function ($matches) use ($values) {
-            return "'" . $this->connector->escape($values[$matches[1]]) . "'";
-        }, $statement);
+        return $builder;
     }
 
     /**
@@ -88,9 +127,11 @@ final class Manager
     public function insert(array $data)
     {
         return Coroutine\create(function () use ($data) {
-            yield $this->connector->query(
-                $this->interpolate($this->builder->insert($data)->build())
-            );
+            $builder = $this->builder->insert($data);
+            $builder = $this->applyOperationsTo($builder);
+
+            list($statement, $values) = $builder->build();
+            yield $this->connector->query($statement, $values);
         });
     }
 
@@ -102,9 +143,11 @@ final class Manager
     public function update(array $data)
     {
         return Coroutine\create(function () use ($data) {
-            yield $this->connector->query(
-                $this->interpolate($this->builder->update($data)->build())
-            );
+            $builder = $this->builder->update($data);
+            $builder = $this->applyOperationsTo($builder);
+
+            list($statement, $values) = $builder->build();
+            yield $this->connector->query($statement, $values);
         });
     }
 
@@ -114,9 +157,11 @@ final class Manager
     public function delete()
     {
         return Coroutine\create(function () {
-            yield $this->connector->query(
-                $this->interpolate($this->builder->delete()->build())
-            );
+            $builder = $this->builder->delete();
+            $builder = $this->applyOperationsTo($builder);
+
+            list($statement, $values) = $builder->build();
+            yield $this->connector->query($statement, $values);
         });
     }
 }

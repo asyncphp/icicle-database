@@ -19,16 +19,16 @@ final class ManagerFactory
             throw new InvalidArgumentException("Undefined driver");
         }
 
+        if (!in_array($config["driver"], ["sqlsrv", "mysql", "pgsql", "sqlite"])) {
+            throw new InvalidArgumentException("Unrecognised driver");
+        }
+
         $connectors = new ConnectorFactory();
         $builders = new BuilderFactory();
 
-        if ($config["driver"] === "mysql") {
-            return new Manager(
-                $connectors->create($config),
-                $builders->create($config)
-            );
-        }
-
-        throw new InvalidArgumentException("Unrecognised driver");
+        return new Manager(
+            $connectors->create($config),
+            $builders->create($config)
+        );
     }
 }

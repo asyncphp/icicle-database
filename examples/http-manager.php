@@ -10,24 +10,21 @@ use Icicle\Loop;
 use Icicle\Socket\SocketInterface;
 use Icicle\Stream\MemorySink;
 
-$config = [
-    "driver" => getenv("ICICLE_DRIVER"),
-    "database" => getenv("ICICLE_DATABASE"),
-    "username" => getenv("ICICLE_USERNAME"),
-    "password" => getenv("ICICLE_PASSWORD"),
-];
-
 $factory = new ManagerFactory();
-$manager = $factory->create($config);
+$manager = $factory->create(require(__DIR__ . "/config.php"));
 
 $server = new Server(function (RequestInterface $request, SocketInterface $socket) use ($manager) {
-    yield $manager->table("test1")->delete();
+    try {
+        yield $manager->table("test")->delete();
 
-    for ($i = 0; $i < 3; $i++) {
-        yield $manager->table("test1")->insert(["text" => "foo"]);
+        for ($i = 0; $i < 5; $i++) {
+            yield $manager->table("test")->insert(["text" => "foo"]);
+        }
+
+        $result = (yield $manager->table("test")->select()->get());
+    } catch (Exception $e) {
+        die($e->getMessage());
     }
-
-    $result = (yield $manager->table("test1")->select()->get());
 
     $sink = new MemorySink();
     yield $sink->end(count($result));

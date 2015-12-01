@@ -2,6 +2,7 @@
 
 namespace AsyncPHP\Icicle\Database;
 
+use AsyncPHP\Icicle\Database\Connector\DoormanConnector;
 use AsyncPHP\Icicle\Database\Connector\MySQLConnector;
 use InvalidArgumentException;
 
@@ -12,7 +13,7 @@ final class ConnectorFactory
      *
      * @return Connector
      *
-     * @throw InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function create(array $config)
     {
@@ -20,13 +21,13 @@ final class ConnectorFactory
             throw new InvalidArgumentException("Undefined driver");
         }
 
-        if ($config["driver"] === "mysql") {
-            $connector = new MySQLConnector();
-            $connector->connect($config);
-
-            return $connector;
+        if (!in_array($config["driver"], ["sqlsrv", "mysql", "pgsql", "sqlite"])) {
+            throw new InvalidArgumentException("Unrecognised driver");
         }
 
-        throw new InvalidArgumentException("Unrecognised driver");
+        $connector = new DoormanConnector();
+        $connector->connect($config);
+
+        return $connector;
     }
 }

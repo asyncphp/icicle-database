@@ -12,27 +12,26 @@ use Icicle\Stream\MemorySink;
 
 $factory = new ConnectorFactory();
 
-$connector = $factory->create([
-    "driver" => getenv("ICICLE_DRIVER"),
-    "database" => getenv("ICICLE_DATABASE"),
-    "username" => getenv("ICICLE_USERNAME"),
-    "password" => getenv("ICICLE_PASSWORD"),
-]);
+$connector = $factory->create(require(__DIR__ . "/config.php"));
 
 $server = new Server(function (RequestInterface $request, SocketInterface $socket) use ($connector) {
-    yield $connector->query(
-        "delete from test1"
-    );
-
-    for ($i = 0; $i < 5; $i++) {
+    try {
         yield $connector->query(
-            "insert into test1 (text) values ('foo')"
+            "delete from test1"
         );
-    }
 
-    $result = (yield $connector->query(
-        "select * from test1"
-    ));
+        for ($i = 0; $i < 5; $i++) {
+            yield $connector->query(
+                "insert into test1 (text) values ('foo')"
+            );
+        }
+
+        $result = (yield $connector->query(
+            "select * from test1"
+        ));
+    } catch (Exception $e) {
+        die($e->getMessage());
+    }
 
     $sink = new MemorySink();
     yield $sink->end(count($result));

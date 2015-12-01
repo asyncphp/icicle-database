@@ -6,9 +6,7 @@ use AsyncPHP\Icicle\Database\BuilderFactory;
 
 $factory = new BuilderFactory();
 
-$builder = $factory->create([
-    "driver" => getenv("ICICLE_DRIVER"),
-]);
+$builder = $factory->create(require(__DIR__ . "/config.php"));
 
 print_r(
     $builder
