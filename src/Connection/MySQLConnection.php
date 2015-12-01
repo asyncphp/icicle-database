@@ -6,6 +6,7 @@ use AsyncPHP\Icicle\Database\Connection;
 use Icicle\Loop;
 use Icicle\Promise\Deferred;
 use Icicle\Promise\PromiseInterface;
+use MySQLi;
 
 class MySQLConnection implements Connection
 {
