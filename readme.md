@@ -26,7 +26,9 @@ yield $connection->query(
 
 ## Caveats
 
-- `mysql` is the only driver currently supported.
+- `mysql` is the only supported driver
+- `mysql` driver does not support prepared statements
+- `join`, `groupBy`, `having`, `orHaving`, `distinct` methods are missing
 
 ## Versioning
 
