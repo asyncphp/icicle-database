@@ -8,21 +8,48 @@
 
 A simple database library, built for Icicle, with promises.
 
-## Usage
+## Using Connectors
 
 ```php
-$factory = new ConnectionFactory();
+$factory = new ConnectorFactory();
 
-$connection = $factory->create([
+$connector = $factory->create([
     "driver" => getenv("ICICLE_DRIVER"),
     "database" => getenv("ICICLE_DATABASE"),
     "username" => getenv("ICICLE_USERNAME"),
     "password" => getenv("ICICLE_PASSWORD"),
 ]);
 
-yield $connection->query(
+yield $connector->query(
     "select * from pages"
 );
+```
+
+## Using Builders
+
+```php
+$factory = new BuilderFactory();
+
+$builder = $factory->create([
+    "driver" => getenv("ICICLE_DRIVER"),
+]);
+
+$builder->table("pages")->select("*")->build();
+```
+
+## Using Managers
+
+```php
+$factory = new ManagerFactory();
+
+$manager = $factory->create([
+    "driver" => getenv("ICICLE_DRIVER"),
+    "database" => getenv("ICICLE_DATABASE"),
+    "username" => getenv("ICICLE_USERNAME"),
+    "password" => getenv("ICICLE_PASSWORD"),
+]);
+
+yield $manager->table("pages")->select("*")->first();
 ```
 
 ## Caveats
