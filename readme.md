@@ -10,18 +10,23 @@ A simple database library, built for Icicle, with promises.
 ## Usage
 
 ```php
-$connection = new AsyncPHP\Icicle\Database\MySQLConnection();
+$factory = new ConnectionFactory();
 
-$connection->connect([
-    "database" => "icicle",
-    "username" => "user",
-    "password" => "****",
+$connection = $factory->create([
+    "driver" => getenv("ICICLE_DRIVER"),
+    "database" => getenv("ICICLE_DATABASE"),
+    "username" => getenv("ICICLE_USERNAME"),
+    "password" => getenv("ICICLE_PASSWORD"),
 ]);
 
 yield $connection->query(
     "select * from pages"
 );
 ```
+
+## Caveats
+
+- `mysql` is the only driver currently supported.
 
 ## Versioning
 
