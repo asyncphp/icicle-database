@@ -1,0 +1,21 @@
+{
+    "name": "asyncphp/icicle-database",
+    "license": "MIT",
+    "require": {
+        "icicleio/icicle": "^0.8"
+    },
+    "require-dev": {
+        "icicleio/http": "^0.2",
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "AsyncPHP\\Icicle\\Database\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AsyncPHP\\Icicle\\Database\\Test\\": "tests"
+        }
+    }
+}
