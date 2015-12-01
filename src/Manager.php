@@ -50,12 +50,7 @@ final class Manager
     {
         return Coroutine\create(function () {
             $rows = (yield $this->limit(1)->get());
-
-            if (count($rows) > 0) {
-                yield $rows[0];
-            } else {
-                yield [];
-            }
+            yield reset($rows);
         });
     }
 
@@ -65,21 +60,63 @@ final class Manager
     public function get()
     {
         return Coroutine\create(function () {
-            list($statement, $values) = $this->builder->build();
+            yield $this->connector->query(
+                $this->interpolate($this->builder->build())
+            );
+        });
+    }
 
-            $query = preg_replace_callback("/\\:([_0-9a-zA-Z]+)/", function($matches) use ($values) {
-                return "'" . $this->connector->escape($values[$matches[1]]) . "'";
-            }, $statement);
+    /**
+     * @param array $build
+     *
+     * @return string
+     */
+    private function interpolate(array $build)
+    {
+        list($statement, $values) = $build;
 
-            yield $this->connector->query($query);
+        return preg_replace_callback("/\\:([_0-9a-zA-Z]+)/", function ($matches) use ($values) {
+            return "'" . $this->connector->escape($values[$matches[1]]) . "'";
+        }, $statement);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return PromiseInterface
+     */
+    public function insert(array $data)
+    {
+        return Coroutine\create(function () use ($data) {
+            yield $this->connector->query(
+                $this->interpolate($this->builder->insert($data)->build())
+            );
+        });
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return PromiseInterface
+     */
+    public function update(array $data)
+    {
+        return Coroutine\create(function () use ($data) {
+            yield $this->connector->query(
+                $this->interpolate($this->builder->update($data)->build())
+            );
         });
     }
 
     /**
      * @return PromiseInterface
      */
-    public function run()
+    public function delete()
     {
-        return $this->get();
+        return Coroutine\create(function () {
+            yield $this->connector->query(
+                $this->interpolate($this->builder->delete()->build())
+            );
+        });
     }
 }

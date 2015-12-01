@@ -21,10 +21,10 @@ $factory = new ManagerFactory();
 $manager = $factory->create($config);
 
 $server = new Server(function (RequestInterface $request, SocketInterface $socket) use ($manager) {
-    yield $manager->table("test1")->delete()->run();
+    yield $manager->table("test1")->delete();
 
-    for ($i = 0; $i < 5; $i++) {
-        yield $manager->table("test1")->insert(["text" => "foo"])->run();
+    for ($i = 0; $i < 3; $i++) {
+        yield $manager->table("test1")->insert(["text" => "foo"]);
     }
 
     $result = (yield $manager->table("test1")->select()->get());
