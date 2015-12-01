@@ -2,6 +2,7 @@
 
 [![Build Status](http://img.shields.io/travis/asyncphp/icicle-database.svg?style=flat-square)](https://travis-ci.org/asyncphp/icicle-database)
 [![Code Quality](http://img.shields.io/scrutinizer/g/asyncphp/icicle-database.svg?style=flat-square)](https://scrutinizer-ci.com/g/asyncphp/icicle-database)
+[![Code Coverage](http://img.shields.io/scrutinizer/coverage/g/asyncphp/icicle-database.svg?style=flat-square)](https://scrutinizer-ci.com/g/asyncphp/icicle-database)
 [![Version](http://img.shields.io/packagist/v/asyncphp/icicle-database.svg?style=flat-square)](https://packagist.org/packages/asyncphp/icicle-database)
 [![License](http://img.shields.io/packagist/l/asyncphp/icicle-database.svg?style=flat-square)](license.md)
 
