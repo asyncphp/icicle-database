@@ -31,8 +31,6 @@ final class MySQLConnector implements Connector
      *
      * @param array $config
      *
-     * @return bool
-     *
      * @throws InvalidArgumentException
      */
     public function connect(array $config)
