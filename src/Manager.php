@@ -46,20 +46,6 @@ final class Manager
     /**
      * @return PromiseInterface
      */
-    public function get()
-    {
-        return Coroutine\create(function () {
-            list($statement, $bindings) = $this->builder->build();
-
-            // TODO
-
-            yield $this->connector->query($statement);
-        });
-    }
-
-    /**
-     * @return PromiseInterface
-     */
     public function first()
     {
         return Coroutine\create(function () {
@@ -71,5 +57,29 @@ final class Manager
                 yield [];
             }
         });
+    }
+
+    /**
+     * @return PromiseInterface
+     */
+    public function get()
+    {
+        return Coroutine\create(function () {
+            list($statement, $values) = $this->builder->build();
+
+            $query = preg_replace_callback("/\\:([_0-9a-zA-Z]+)/", function($matches) use ($values) {
+                return "'" . $this->connector->escape($values[$matches[1]]) . "'";
+            }, $statement);
+
+            yield $this->connector->query($query);
+        });
+    }
+
+    /**
+     * @return PromiseInterface
+     */
+    public function run()
+    {
+        return $this->get();
     }
 }

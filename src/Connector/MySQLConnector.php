@@ -124,4 +124,16 @@ final class MySQLConnector implements Connector
 
         return $deferred->getPromise();
     }
+
+    /**
+     * @inheritdoc
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function escape($value)
+    {
+        return mysqli_real_escape_string($this->connection, $value);
+    }
 }

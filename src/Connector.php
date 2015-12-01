@@ -24,4 +24,13 @@ interface Connector
      * @return PromiseInterface
      */
     public function query($query);
+
+    /**
+     * Escapes a value for interpolation.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function escape($value);
 }
