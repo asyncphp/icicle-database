@@ -112,7 +112,7 @@ final class MySQLConnector implements Connector
                             return $deferred->resolve();
                         }
 
-                        $rows = $result->fetch_all();
+                        $rows = $result->fetch_all(MYSQLI_ASSOC);
                         $result->free();
 
                         $this->ready = true;
