@@ -2,9 +2,7 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
-use AsyncPHP\Icicle\Database\Builder\MySQLBuilder;
-use AsyncPHP\Icicle\Database\Connector\MySQLConnector;
-use AsyncPHP\Icicle\Database\Manager;
+use AsyncPHP\Icicle\Database\ManagerFactory;
 use Icicle\Coroutine;
 use Icicle\Loop;
 
@@ -16,12 +14,8 @@ Coroutine\create(function () {
         "password" => getenv("ICICLE_PASSWORD"),
     ];
 
-    $manager = new Manager(
-        $connector = new MySQLConnector(),
-        new MySQLBuilder($config)
-    );
-
-    $connector->connect($config);
+    $factory = new ManagerFactory();
+    $manager = $factory->create($config);
 
     print_r(yield $manager->table("test1")->select()->get());
 });
