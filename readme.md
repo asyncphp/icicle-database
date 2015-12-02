@@ -1,4 +1,4 @@
-# Icicle Cache
+# Icicle Database
 
 [![Build Status](http://img.shields.io/travis/asyncphp/icicle-database.svg?style=flat-square)](https://travis-ci.org/asyncphp/icicle-database)
 [![Code Quality](http://img.shields.io/scrutinizer/g/asyncphp/icicle-database.svg?style=flat-square)](https://scrutinizer-ci.com/g/asyncphp/icicle-database)
