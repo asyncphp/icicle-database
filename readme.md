@@ -6,7 +6,11 @@
 [![Version](http://img.shields.io/packagist/v/asyncphp/icicle-database.svg?style=flat-square)](https://packagist.org/packages/asyncphp/icicle-database)
 [![License](http://img.shields.io/packagist/l/asyncphp/icicle-database.svg?style=flat-square)](license.md)
 
-A simple database library, built for Icicle, with promises.
+Distributed, async DBAL, for Icicle applications.
+
+## What?
+
+Synchronous architectures often use PDO to interact with databases. PDO does not provide ways to use it in asynchronous architectures, so this library uses a few tricks to allow PDO to execute transparently in separate processes.
 
 ## Using Connectors
 
