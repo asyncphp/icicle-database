@@ -4,19 +4,16 @@ namespace AsyncPHP\Icicle\Database\Connector;
 
 use AsyncPHP\Doorman\Manager;
 use AsyncPHP\Doorman\Manager\ProcessManager;
-use AsyncPHP\Doorman\Task\ProcessCallbackTask;
 use AsyncPHP\Icicle\Database\Connector;
 use AsyncPHP\Remit\Client;
 use AsyncPHP\Remit\Client\ZeroMqClient;
 use AsyncPHP\Remit\Location\InMemoryLocation;
 use AsyncPHP\Remit\Server;
 use AsyncPHP\Remit\Server\ZeroMqServer;
-use Aura\Sql\ExtendedPdo;
 use Icicle\Loop;
 use Icicle\Promise\Deferred;
 use Icicle\Promise\PromiseInterface;
 use InvalidArgumentException;
-use PDO;
 
 final class DoormanConnector implements Connector
 {
@@ -56,32 +53,14 @@ final class DoormanConnector implements Connector
      */
     public function connect(array $config)
     {
+        $this->validate($config);
+        $this->remit($config);
+
         $this->manager = new ProcessManager();
 
         if (isset($config["log"])) {
             $this->manager->setLogPath($config["log"]);
         }
-
-        $this->validate($config);
-        $this->connectRemit($config);
-
-        $this->server->addListener("r", function ($result, $id) {
-            if (isset($this->deferred[$id])) {
-                $this->deferred[$id]->resolve($result);
-                unset($this->deferred[$id]);
-            }
-        });
-
-        $this->server->addListener("e", function ($error, $id) {
-            if (isset($this->deferred[$id])) {
-                $this->deferred[$id]->reject($error);
-                unset($this->deferred[$id]);
-            }
-        });
-
-        Loop\periodic(0, function () {
-            $this->server->tick();
-        });
 
         $this->manager->addTask(new DoormanConnectorTask($config));
         $this->manager->tick();
@@ -126,34 +105,49 @@ final class DoormanConnector implements Connector
     /**
      * @param array $config
      */
-    private function connectRemit(array $config)
+    private function remit(array $config)
     {
-        $server = $config["remit"]["server"];
-        $client = $config["remit"]["client"];
-
         if ($config["remit"]["driver"] === "zeromq") {
-            $server = array_merge([
+            $config["remit"]["server"] += [
                 "host" => "127.0.0.1",
-            ], $server);
+            ];
+
+            $config["remit"]["client"] += [
+                "host" => "127.0.0.1",
+            ];
 
             $this->server = new ZeroMqServer(
                 new InMemoryLocation(
-                    $server["host"],
-                    $server["port"]
+                    $config["remit"]["server"]["host"],
+                    $config["remit"]["server"]["port"]
                 )
             );
-
-            $client = array_merge([
-                "host" => "127.0.0.1",
-            ], $client);
 
             $this->client = new ZeroMqClient(
                 new InMemoryLocation(
-                    $client["host"],
-                    $client["port"]
+                    $config["remit"]["client"]["host"],
+                    $config["remit"]["client"]["port"]
                 )
             );
         }
+
+        $this->server->addListener("r", function ($result, $id) {
+            if (isset($this->deferred[$id])) {
+                $this->deferred[$id]->resolve($result);
+                unset($this->deferred[$id]);
+            }
+        });
+
+        $this->server->addListener("e", function ($error, $id) {
+            if (isset($this->deferred[$id])) {
+                $this->deferred[$id]->reject($error);
+                unset($this->deferred[$id]);
+            }
+        });
+
+        Loop\periodic(0, function () {
+            $this->server->tick();
+        });
     }
 
     /**
@@ -170,12 +164,10 @@ final class DoormanConnector implements Connector
     {
         $id = $this->id++;
 
-        $deferred = new Deferred();
+        $this->deferred["d{$id}"] = new Deferred();
 
         $this->client->emit("q", [$query, $values, "d{$id}"]);
 
-        $this->deferred["d{$id}"] = $deferred;
-
-        return $deferred->getPromise();
+        return $this->deferred["d{$id}"]->getPromise();
     }
 }
