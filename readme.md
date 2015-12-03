@@ -72,9 +72,10 @@ yield $manager->table("pages")->select("*")->first();
 
 ## Caveats
 
-- `mysql`, `pgsql`, `sqlite`, and `sqlsrv` are the only supported drivers.
-- `join`, `groupBy`, `having`, `orHaving`, `distinct` methods are missing.
-- PDO is blocking, so statements are executed in a different process. Remit is used for inter-process communication, and there is a bit of overhead.
+- `mysql`, `pgsql`, `sqlite`, and `sqlsrv` are the only supported drivers
+- `join`, `groupBy`, `having`, `orHaving`, `distinct` methods are missing
+- Statements are executed in different processes to avoid blocking
+- Remit is used for inter-process communication
 
 ## Versioning
 
