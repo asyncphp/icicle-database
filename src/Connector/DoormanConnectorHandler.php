@@ -80,11 +80,11 @@ final class DoormanConnectorHandler implements Handler
     private function newConnectionString(array $config)
     {
         if ($config["driver"] === "mysql") {
-            return "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']};unix_socket={$config['socket']};charset={$config['charset']}";
+            return "mysql:host={$config['host']};port={$config['port']};dbname={$config['schema']};unix_socket={$config['socket']};charset={$config['charset']}";
         }
 
         if ($config["driver"] === "pgsql") {
-            return "pgsql:host={$config['host']};port={$config['port']};dbname={$config['database']}";
+            return "pgsql:host={$config['host']};port={$config['port']};dbname={$config['schema']}";
         }
 
         if ($config["driver"] === "sqlite") {
@@ -92,7 +92,7 @@ final class DoormanConnectorHandler implements Handler
         }
 
         if ($config["driver"] === "sqlsrv") {
-            return "sqlsrv:Server={$config['host']},{$config['port']};Database={$config['database']}";
+            return "sqlsrv:Server={$config['host']},{$config['port']};Database={$config['schema']}";
         }
     }
 }

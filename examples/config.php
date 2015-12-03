@@ -2,7 +2,7 @@
 
 return [
     "driver" => getenv("ICICLE_DRIVER"),
-    "database" => getenv("ICICLE_DATABASE"),
+    "schema" => getenv("ICICLE_SCHEMA"),
     "username" => getenv("ICICLE_USERNAME"),
     "password" => getenv("ICICLE_PASSWORD"),
     "log" => __DIR__,
