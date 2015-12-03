@@ -5,6 +5,7 @@ return [
     "database" => getenv("ICICLE_DATABASE"),
     "username" => getenv("ICICLE_USERNAME"),
     "password" => getenv("ICICLE_PASSWORD"),
+    "log" => __DIR__,
     "remit" => [
         "driver" => "zeromq",
         "server" => [

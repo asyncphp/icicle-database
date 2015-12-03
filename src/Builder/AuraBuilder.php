@@ -7,7 +7,7 @@ use Aura\SqlQuery\QueryFactory;
 use Aura\SqlQuery\QueryInterface;
 use LogicException;
 
-class AuraBuilder implements Builder
+final class AuraBuilder implements Builder
 {
     /**
      * @var QueryFactory

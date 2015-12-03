@@ -58,9 +58,12 @@ final class DoormanConnector implements Connector
     {
         $this->manager = new ProcessManager();
 
+        if (isset($config["log"])) {
+            $this->manager->setLogPath($config["log"]);
+        }
+
         $this->validate($config);
         $this->connectRemit($config);
-        $this->connectDoorman($config);
 
         $this->server->addListener("r", function ($result, $id) {
             if (isset($this->deferred[$id])) {
@@ -80,6 +83,7 @@ final class DoormanConnector implements Connector
             $this->server->tick();
         });
 
+        $this->manager->addTask(new DoormanConnectorTask($config));
         $this->manager->tick();
     }
 
@@ -150,138 +154,6 @@ final class DoormanConnector implements Connector
                 )
             );
         }
-    }
-
-    /**
-     * @param array $config
-     */
-    private function connectDoorman(array $config)
-    {
-        $server = $config["remit"]["server"];
-        $client = $config["remit"]["client"];
-
-        if ($config["remit"]["driver"] === "zeromq") {
-            $task = new ProcessCallbackTask(function () use ($config, $server, $client) {
-                $config = array_merge([
-                    "host" => "127.0.0.1",
-                    "port" => 3306,
-                    "charset" => "utf8",
-                    "socket" => null,
-                ], $config);
-
-                $server = array_merge([
-                    "host" => "127.0.0.1",
-                ], $server);
-
-                $client = array_merge([
-                    "host" => "127.0.0.1",
-                ], $client);
-
-                $remitServer = new ZeroMqServer(
-                    new InMemoryLocation(
-                        $client["host"],
-                        $client["port"]
-                    )
-                );
-
-                $remitClient = new ZeroMqClient(
-                    new InMemoryLocation(
-                        $server["host"],
-                        $server["port"]
-                    )
-                );
-
-                if ($config["driver"] === "mysql") {
-                    $dsn = $this->mysql($config);
-                }
-
-                if ($config["driver"] === "pgsql") {
-                    $dsn = $this->pgsql($config);
-                }
-
-                if ($config["driver"] === "sqlite") {
-                    $dsn = $this->sqlite($config);
-                    $config["username"] = null;
-                    $config["password"] = null;
-                }
-
-                if ($config["driver"] === "sqlsrv") {
-                    $dsn = $this->sqlsrv($config);
-                }
-
-                $connection = new ExtendedPdo(
-                    new PDO($dsn, $config["username"], $config["password"])
-                );
-
-                $remitServer->addListener("q", function ($query, $values, $id) use ($remitClient, $connection) {
-                    $remitClient->emit("r", [$connection->fetchAll($query, $values), $id]);
-                });
-
-                Loop\periodic(0, function () use ($remitServer) {
-                    $remitServer->tick();
-                });
-
-                Loop\run();
-            });
-
-            $this->manager->addTask($task);
-        }
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    private function mysql(array $config)
-    {
-        $host = (string) $config["host"];
-        $port = (int) $config["port"];
-        $database = (string) $config["database"];
-        $socket = (string) $config["socket"];
-        $charset = (string) $config["charset"];
-
-        return "mysql:host={$host};port={$port};dbname={$database};unix_socket={$socket};charset={$charset}";
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    private function pgsql(array $config)
-    {
-        $host = (string) $config["host"];
-        $port = (int) $config["port"];
-        $database = (string) $config["database"];
-
-        return "pgsql:host={$host};port={$port};dbname={$database}";
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    private function sqlite(array $config)
-    {
-        $file = (string) $config["file"];
-
-        return "sqlite:{$file}";
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    private function sqlsrv(array $config)
-    {
-        $host = (string) $config["host"];
-        $port = (int) $config["port"];
-        $database = (string) $config["database"];
-
-        return "sqlsrv:Server={$host},{$port};Database={$database}";
     }
 
     /**

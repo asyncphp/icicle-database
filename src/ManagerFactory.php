@@ -11,7 +11,7 @@ final class ManagerFactory
      *
      * @return Manager
      *
-     * @throw InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function create(array $config)
     {

@@ -18,8 +18,8 @@ Coroutine\create(function () {
     }
 
     while (true) {
-        yield $connector->query("select * from test where text = :text", ["text" => "foo"]);
-        print ".";
+        $result = (yield $connector->query("select * from test where text = :text", ["text" => "foo"]));
+        print print_r($result, true) . "\n";
     }
 });
 
