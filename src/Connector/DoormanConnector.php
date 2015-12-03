@@ -160,7 +160,7 @@ final class DoormanConnector implements Connector
      *
      * @throws InvalidArgumentException
      */
-    public function query($query, $values)
+    public function query($query, $values = [])
     {
         $id = $this->id++;
 
