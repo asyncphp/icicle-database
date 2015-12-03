@@ -18,7 +18,7 @@ class ManagerFactoryTest extends PHPUnit_Framework_TestCase
                 "driver" => "mysql",
                 "username" => "root",
                 "password" => "",
-                "database" => "icicle",
+                "schema" => "icicle",
                 "remit" => [
                     "driver" => "zeromq",
                     "server" => [
