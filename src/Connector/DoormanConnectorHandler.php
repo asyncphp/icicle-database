@@ -68,7 +68,12 @@ final class DoormanConnectorHandler implements Handler
         $server->addListener("d", function () use ($connection, $server, $client) {
             $client->emit("dd");
 
-            $connection->disconnect();
+            try {
+                $connection->disconnect();
+            } catch (Exception $exception) {
+                // TODO: find an elegant way to deal with this
+            }
+
             $server->disconnect();
             $client->disconnect();
 
