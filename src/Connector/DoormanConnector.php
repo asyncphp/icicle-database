@@ -145,6 +145,11 @@ final class DoormanConnector implements Connector
             }
         });
 
+        $this->server->addListener("dd", function() {
+            $this->server->disconnect();
+            $this->client->disconnect();
+        });
+
         Loop\periodic(0, function () {
             $this->server->tick();
         });
@@ -169,5 +174,18 @@ final class DoormanConnector implements Connector
         $this->client->emit("q", [$query, $values, "d{$id}"]);
 
         return $this->deferred["d{$id}"]->getPromise();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disconnect()
+    {
+        $this->client->emit("d");
+    }
+
+    public function __destruct()
+    {
+        $this->disconnect();
     }
 }

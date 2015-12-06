@@ -10,6 +10,8 @@ use AsyncPHP\Remit\Server\ZeroMqServer;
 use Aura\Sql\ExtendedPdo;
 use Icicle\Loop;
 use PDO;
+use AsyncPHP\Remit\Server;
+use AsyncPHP\Remit\Client;
 
 final class DoormanConnectorHandler implements Handler
 {
@@ -61,6 +63,16 @@ final class DoormanConnectorHandler implements Handler
 
         $server->addListener("q", function ($query, $values, $id) use ($client, $connection) {
             $client->emit("r", [$connection->fetchAll($query, $values), $id]);
+        });
+
+        $server->addListener("d", function () use ($connection, $server, $client) {
+            $client->emit("dd");
+
+            $connection->disconnect();
+            $server->disconnect();
+            $client->disconnect();
+
+            Loop\stop();
         });
 
         Loop\periodic(0, function () use ($server) {
