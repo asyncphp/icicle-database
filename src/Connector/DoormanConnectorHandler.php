@@ -4,14 +4,14 @@ namespace AsyncPHP\Icicle\Database\Connector;
 
 use AsyncPHP\Doorman\Handler;
 use AsyncPHP\Doorman\Task;
+use AsyncPHP\Remit\Client;
 use AsyncPHP\Remit\Client\ZeroMqClient;
 use AsyncPHP\Remit\Location\InMemoryLocation;
+use AsyncPHP\Remit\Server;
 use AsyncPHP\Remit\Server\ZeroMqServer;
 use Aura\Sql\ExtendedPdo;
 use Icicle\Loop;
 use PDO;
-use AsyncPHP\Remit\Server;
-use AsyncPHP\Remit\Client;
 
 final class DoormanConnectorHandler implements Handler
 {
