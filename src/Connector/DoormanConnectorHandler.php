@@ -10,6 +10,7 @@ use AsyncPHP\Remit\Location\InMemoryLocation;
 use AsyncPHP\Remit\Server;
 use AsyncPHP\Remit\Server\ZeroMqServer;
 use Aura\Sql\ExtendedPdo;
+use Exception;
 use Icicle\Loop;
 use PDO;
 
