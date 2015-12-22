@@ -53,7 +53,8 @@ final class DoormanConnector implements Connector
      */
     public function connect(array $config)
     {
-        $this->validate($config);
+        $config = $this->validate($config);
+
         $this->remit($config);
 
         $this->manager = new ProcessManager();
@@ -68,6 +69,8 @@ final class DoormanConnector implements Connector
 
     /**
      * @param array $config
+     *
+     * @return array
      *
      * @throws InvalidArgumentException
      */
@@ -100,6 +103,10 @@ final class DoormanConnector implements Connector
         } else {
             throw new InvalidArgumentException("Unrecognised remit driver");
         }
+
+        // TODO: validate connection details
+
+        return $config;
     }
 
     /**
@@ -145,7 +152,7 @@ final class DoormanConnector implements Connector
             }
         });
 
-        $this->server->addListener("dd", function() {
+        $this->server->addListener("dd", function () {
             $this->server->disconnect();
             $this->client->disconnect();
         });
@@ -182,10 +189,5 @@ final class DoormanConnector implements Connector
     public function disconnect()
     {
         $this->client->emit("d");
-    }
-
-    public function __destruct()
-    {
-        $this->disconnect();
     }
 }

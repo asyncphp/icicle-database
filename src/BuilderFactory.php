@@ -17,6 +17,22 @@ final class BuilderFactory
      */
     public function create(array $config)
     {
+        $config = $this->validate($config);
+
+        return new AuraBuilder(
+            new QueryFactory($config["driver"])
+        );
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     *
+     * @throws InvalidArgumentException
+     */
+    private function validate(array $config)
+    {
         if (!isset($config["driver"])) {
             throw new InvalidArgumentException("Undefined driver");
         }
@@ -25,8 +41,6 @@ final class BuilderFactory
             throw new InvalidArgumentException("Unrecognised driver");
         }
 
-        return new AuraBuilder(
-            new QueryFactory($config["driver"])
-        );
+        return $config;
     }
 }

@@ -2,8 +2,8 @@
 
 namespace AsyncPHP\Icicle\Database;
 
+use AsyncPHP\Icicle\Database\Connector\BlockingConnector;
 use AsyncPHP\Icicle\Database\Connector\DoormanConnector;
-use AsyncPHP\Icicle\Database\Connector\MySQLConnector;
 use InvalidArgumentException;
 
 final class ConnectorFactory
@@ -17,6 +17,30 @@ final class ConnectorFactory
      */
     public function create(array $config)
     {
+        $config = $this->validate($config);
+
+        if ($config["connector"] === "doorman") {
+            $connector = new DoormanConnector();
+        }
+
+        if ($config["connector"] === "blocking") {
+            $connector = new BlockingConnector();
+        }
+
+        $connector->connect($config);
+
+        return $connector;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     *
+     * @throws InvalidArgumentException
+     */
+    private function validate(array $config)
+    {
         if (!isset($config["driver"])) {
             throw new InvalidArgumentException("Undefined driver");
         }
@@ -25,9 +49,14 @@ final class ConnectorFactory
             throw new InvalidArgumentException("Unrecognised driver");
         }
 
-        $connector = new DoormanConnector();
-        $connector->connect($config);
+        if (!isset($config["connector"])) {
+            throw new InvalidArgumentException("Undefined connector");
+        }
 
-        return $connector;
+        if (!in_array($config["connector"], ["doorman", "blocking"])) {
+            throw new InvalidArgumentException("Unrecognised connector");
+        }
+
+        return $config;
     }
 }
