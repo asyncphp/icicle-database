@@ -9,36 +9,25 @@ use PHPUnit_Framework_TestCase;
 
 class ManagerFactoryTest extends PHPUnit_Framework_TestCase
 {
-    public function testInsert()
+    /**
+     * @dataProvider getConnectors
+     *
+     * @param array $config
+     */
+    public function testInsert(array $config)
     {
-        Coroutine\create(function () {
+        Coroutine\create(function () use ($config) {
             $factory = new ManagerFactory();
-
-            $manager = $factory->create([
-                "driver" => "mysql",
-                "username" => "root",
-                "password" => "",
-                "schema" => "icicle",
-                "remit" => [
-                    "driver" => "zeromq",
-                    "server" => [
-                        "port" => 5555,
-                    ],
-                    "client" => [
-                        "port" => 5556,
-                    ],
-                ],
-            ]);
+            $database = $factory->create($config);
 
             $time = time();
 
-            yield
-            $manager
+            yield $database
                 ->table("test")
                 ->insert(["text" => $time]);
 
-            $row = (yield
-            $manager
+            $row = (
+            yield $database
                 ->table("test")
                 ->select()
                 ->where("text = ?", $time)
@@ -62,5 +51,41 @@ class ManagerFactoryTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($expected, $actual);
             Loop\stop();
         });
+    }
+
+    /**
+     * @return array
+     */
+    public function getConnectors()
+    {
+        return [
+            [
+                [
+                    "connector" => "blocking",
+                    "driver" => "mysql",
+                    "username" => "root",
+                    "password" => "",
+                    "schema" => "icicle",
+                ],
+            ],
+            [
+                [
+                    "connector" => "doorman",
+                    "driver" => "mysql",
+                    "username" => "root",
+                    "password" => "",
+                    "schema" => "icicle",
+                    "remit" => [
+                        "driver" => "zeromq",
+                        "server" => [
+                            "port" => 5555,
+                        ],
+                        "client" => [
+                            "port" => 5556,
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

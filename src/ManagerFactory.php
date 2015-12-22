@@ -15,14 +15,6 @@ final class ManagerFactory
      */
     public function create(array $config)
     {
-        if (!isset($config["driver"])) {
-            throw new InvalidArgumentException("Undefined driver");
-        }
-
-        if (!in_array($config["driver"], ["sqlsrv", "mysql", "pgsql", "sqlite"])) {
-            throw new InvalidArgumentException("Unrecognised driver");
-        }
-
         $connectors = new ConnectorFactory();
         $builders = new BuilderFactory();
 
