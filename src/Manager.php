@@ -164,4 +164,12 @@ final class Manager
             yield $this->connector->query($statement, $values);
         });
     }
+
+    /**
+     * Disconnects from a database.
+     */
+    public function disconnect()
+    {
+        $this->connector->disconnect();
+    }
 }

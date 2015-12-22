@@ -12,9 +12,14 @@ use PDO;
 final class BlockingConnector implements Connector
 {
     /**
+     * @var PDO
+     */
+    private $pdo;
+
+    /**
      * @var ExtendedPdo
      */
-    private $connection;
+    private $extendedPdo;
 
     /**
      * @inheritdoc
@@ -29,9 +34,8 @@ final class BlockingConnector implements Connector
     {
         $config = $this->validate($config);
 
-        $this->connection = new ExtendedPdo(
-            new PDO($this->newConnectionString($config), $config["username"], $config["password"])
-        );
+        $this->pdo = new PDO($this->newConnectionString($config), $config["username"], $config["password"]);
+        $this->extendedPdo = new ExtendedPdo($this->pdo);
     }
 
     /**
@@ -94,7 +98,16 @@ final class BlockingConnector implements Connector
     public function query($query, $values)
     {
         return Promise\resolve(
-            $this->connection->fetchAll($query, $values)
+            $this->extendedPdo->fetchAll($query, $values)
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disconnect()
+    {
+        $this->extendedPdo = null;
+        $this->pdo = null;
     }
 }

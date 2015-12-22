@@ -30,4 +30,9 @@ interface Connector
      * @throws InvalidArgumentException
      */
     public function query($query, $values);
+
+    /**
+     * Disconnects from a database.
+     */
+    public function disconnect();
 }
