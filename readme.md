@@ -1,3 +1,7 @@
+# Deprecated
+
+Please don't use this. Icicle is no longer in active development, and as such, neither is this.
+
 # Icicle Database
 
 [![Build Status](http://img.shields.io/travis/asyncphp/icicle-database.svg?style=flat-square)](https://travis-ci.org/asyncphp/icicle-database)
